@@ -1,0 +1,10 @@
+[project]
+name = "job-search"
+version = "0.1.0"
+description = "Search the stapply.ai/ats-scrapers job dataset for engineering roles"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ats-scrapers[parquet]>=0.2.0",
+    "pandas>=3.0.5",
+]
