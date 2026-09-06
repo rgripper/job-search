@@ -1,0 +1,67 @@
+name: Daily job search
+
+on:
+  schedule:
+    # 15:00 UTC = 17:00 Berlin (CEST) / 16:00 (CET).
+    # The stapply snapshot publishes at 14:30 UTC, so this runs 30 min after it
+    # lands and always picks up that day's data.
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two Pages deployments race; queue instead of cancelling so a
+# scheduled run isn't dropped by a manual one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Run job search
+        run: |
+          uv run job_search.py \
+            --profiles engineer product \
+            --city Berlin \
+            --country DE \
+            --max-age-days 7 \
+            --require-date
+
+      - name: Assemble site
+        run: |
+          mkdir -p site
+          cp results/*.html results/*.csv site/
+          cp results/latest.html site/index.html
+          ls -la site
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: search
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

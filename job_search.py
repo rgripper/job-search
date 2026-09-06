@@ -553,7 +553,7 @@ def write_html(path: Path, sections: list[dict], meta: dict) -> None:
 <div class="meta">
   Generated {meta["generated"]} &nbsp;&middot;&nbsp; dataset snapshot {meta["snapshot"]}<br>
   {filt}<br>
-  {" &nbsp;&middot;&nbsp; ".join(totals)}
+  {" &nbsp;&middot;&nbsp; ".join(totals)} &nbsp;&middot;&nbsp; <a href="jobs_{meta["date"]}.csv">download CSV</a>
 </div>
 <div class="controls">
   <input id="q" type="search" placeholder="filter all tables (title, company, location, source&hellip;)">

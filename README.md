@@ -22,7 +22,7 @@ RAM). For each **profile** (a named set of title keywords) it produces two lists
 | profile | title keywords |
 |---|---|
 | `engineer` | engineer, tech lead |
-| `product` | product manager, product management, product owner, head of product, product lead, chief product officer, director of product, vp product, vp of product |
+| `product` | product manager, product management, product owner |
 
 Edit `PROFILES` in `job_search.py` to add or tune them. `--profiles engineer product`
 (default runs both); `--keywords <words…>` overrides with an ad-hoc `custom` profile.
@@ -43,7 +43,25 @@ Outputs to `results/`:
 | `jobs_<date>.html` | one section per profile; clickable job + apply links, text filter, sortable columns, remote/hybrid/onsite toggle |
 | `latest.html` | copy of today's page |
 
-## Daily use
+## Published page
+
+A GitHub Actions workflow (`.github/workflows/daily.yml`) runs the search every
+day at **15:00 UTC** (17:00 Berlin) and deploys the result to GitHub Pages:
+
+**https://rgripper.github.io/job-search/**
+
+15:00 UTC is deliberate: the stapply snapshot publishes at 14:30 UTC, so each run
+picks up that day's data. Trigger it by hand from the Actions tab
+(`Run workflow`) or with `gh workflow run "Daily job search"`.
+
+The published site holds the current run's `index.html` (same as `latest.html`),
+the dated `jobs_<date>.html`, and the `jobs_<date>.csv` (linked from the page
+header). It is replaced on each deploy - there is no archive of past days.
+
+> GitHub disables scheduled workflows on repos with no activity for 60 days;
+> push a commit or re-enable it in the Actions tab if that happens.
+
+## Daily use (local)
 
 ```bash
 ./daily.sh                 # engineer + product profiles, Berlin + DE-remote, posted in the last 7 days, opens latest.html
